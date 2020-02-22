@@ -1,0 +1,141 @@
+import re
+
+
+"""old method to test if sequence is DNA sequence
+def is_DNA(seq):
+    unused_char = ('B', 'D', 'E', 'F', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'U', 'V', 'W', 'X', 'Y', 'Z')
+    is_valid = True
+    for base in seq:
+        for char in unused_char:
+            if base == char:
+                return False
+    if is_valid:
+        return True"""
+
+# initalized DNAseq object
+class DNAseq(object):
+
+    def __init__(self):
+        self.get_seq()
+
+
+    # confirms that sequence input is dna
+    def is_DNA(self):
+        is_valid = True
+        invalid_base = r"[^ACGT]"
+        for all in self.seq:
+            if re.search(invalid_base, self.seq):
+                return False
+        if is_valid:
+            return True
+
+    # gets DNA seq from user. store this sequence as a part of the object
+    def get_seq(self):
+        self.seq = input("Enter sequence: ")
+        self.seq = self.seq.upper()
+        if (len(self.seq) == 0):
+            print("No Sequence Entered, Try Again or type Exit")
+            self.get_seq()
+        elif self.is_DNA():
+            return self.seq
+        elif (self.seq == "EXIT"):
+            exit()
+        else:
+            print("Invalid Sequence, Try Again or type Exit")
+            return self.get_seq()
+
+    # counts the number of bases in sequence total and for each nucleotide, also convert each into a percentage. store these values as a part of the object
+    def base_perc(self):
+        self.length = float(len(self.seq))
+        self.A = 0
+        self.C = 0
+        self.G = 0
+        self.T = 0
+        for base in self.seq:
+            if base == "A":
+                self.A += 1
+            elif base == "C":
+                self.C += 1
+            elif base == "G":
+                self.G +=1
+            elif base == "T":
+                self.T += 1
+        print(f"A: {self.A}, C: {self.C}, G: {self.G}, T: {self.T}")
+        self.perA = round((self.A/self.length * 100), 2)
+        self.perC = round((self.C/self.length * 100), 2)
+        self.perG = round((self.G/self.length * 100), 2)    
+        self.perT = round((self.T/self.length * 100), 2)
+        print(f"A: {self.perA}%, C: {self.perC}%, G: {self.perG}%, T: {self.perT}%")
+        print(f"GC content: {self.perG + self.perC}%")
+
+    # counts each codon(3 consecutive bases) found, each base is only counted once. for intance ATCGAG will count ATC:1 GAG:1 will not count TCG, CGA. store these values as a part of the object
+    def codon_count(self):
+        print(f"Number of codons: {self.length/3.0}")
+        self.codon = { 
+            "AAA": 0, "AAC": 0, "AAG": 0, "AAT": 0, "ACA": 0, "ACC": 0, "ACG": 0, "ACT": 0, "AGA": 0, "AGC": 0, "AGG": 0, "AGT": 0, "ATA": 0, "ATC": 0, "ATG": 0, "ATT": 0,
+            "CAA": 0, "CAC": 0, "CAG": 0, "CAT": 0, "CCA": 0, "CCC": 0, "CCG": 0, "CCT": 0, "CGA": 0, "CGC": 0, "CGG": 0, "CGT": 0, "CTA": 0, "CTC": 0, "CTG": 0, "CTT": 0,
+            "GAA": 0, "GAC": 0, "GAG": 0, "GAT": 0, "GCA": 0, "GCC": 0, "GCG": 0, "GCT": 0, "GGA": 0, "GGC": 0, "GGG": 0, "GGT": 0, "GTA": 0, "GTC": 0, "GTG": 0, "GTT": 0,
+            "TAA": 0, "TAC": 0, "TAG": 0, "TAT": 0, "TCA": 0, "TCC": 0, "TCG": 0, "TCT": 0, "TGA": 0, "TGC": 0, "TGG": 0, "TGT": 0, "TTA": 0, "TTC": 0, "TTG": 0, "TTT": 0
+            }
+        x = 0
+        while (x < len(self.seq)):
+            current_codon = self.seq[x: (x + 3)]
+            if (len(current_codon) == 3):
+                self.codon[current_codon] += 1
+            x += 3
+        print(self.codon)
+    # converts the codons into their corresponding amino acid. store these values as a part of the object
+    def amino_count(self):
+        self.codon_count()
+        self.amino = {
+            "Ala": (self.codon["GCT"] + self.codon["GCC"] + self.codon["GCA"] + self.codon["GCG"]),
+            "Arg": (self.codon["CGT"] + self.codon["GCG"] + self.codon["CGA"] + self.codon["CGG"] + self.codon["AGA"] + self.codon["AGG"]), 
+            "Asn": (self.codon["AAT"] + self.codon["AAC"]),
+            "Asp": (self.codon["GAT"] + self.codon["GAC"]),
+            "Cys": (self.codon["TGT"] + self.codon["TGC"]),
+            "Gln": (self.codon["CAA"] + self.codon["CAG"]),
+            "Glu": (self.codon["GAG"] + self.codon["GAG"]),
+            "Gly": (self.codon["GGT"] + self.codon["GGC"] + self.codon["GGA"] + self.codon["GGG"]),
+            "His": (self.codon["CAT"] + self.codon["CAC"]),
+            "Ile": (self.codon["ATT"] + self.codon["ATC"] + self.codon["ATA"]),
+            "Leu": (self.codon["TTA"] + self.codon["TTG"] + self.codon["CTT"] + self.codon["CTC"] + self.codon["CTA"] + self.codon["CTG"]),
+            "Lys": (self.codon["AAA"] + self.codon["AAG"]),
+            "Met": (self.codon["ATG"]),
+            "Phe": (self.codon["TTT"] + self.codon["TTC"]),
+            "Pro": (self.codon["CCT"] + self.codon["CCC"] + self.codon["CCA"] + self.codon["CCG"]),
+            "Ser": (self.codon["TCT"] + self.codon["TCC"] + self.codon["TCA"] + self.codon["TCG"] + self.codon["AGT"] + self.codon["AGC"]),
+            "Thr": (self.codon["ACT"] + self.codon["ACC"] + self.codon["ACA"] + self.codon["ACG"]),
+            "Trp": (self.codon["TGG"]),
+            "Tyr": (self.codon["TAT"] + self.codon["TAC"]),
+            "Val": (self.codon["GTT"] + self.codon["GTC"] + self.codon["GTA"] + self.codon["GTG"]),
+            "STOP": (self.codon["TAA"] + self.codon["TGA"] + self.codon["TAG"])
+            }
+        print(self.amino)
+
+    def perc_change(self):
+        #number_of_fives represents how many codons have a 5/9 to make a mutation in the sequence 
+        self.number_of_fives = (self.codon["AGA"] + self.codon["AGG"] + self.codon["CTA"] + self.codon["CTG"] + self.codon["CGA"] + self.codon["CGG"] + self.codon["CTA"] + self.codon["CTG"])
+        
+        self.number_of_sixes = (self.codon["ACA"] + self.codon["ACC"] + self.codon["ACG"] + self.codon["ACT"] + self.codon["CCA"] + self.codon["CCC"] + self.codon["CCG"] + self.codon["CCT"] + 
+            self.codon["CGC"] + self.codon["CGT"] + self.codon["CTC"] + self.codon["CTT"] + self.codon["GCA"] + self.codon["GCC"] + self.codon["GCG"] + self.codon["GCT"] + self.codon["GGA"] + 
+            self.codon["GGC"] + self.codon["GGG"] + self.codon["GGT"] + self.codon["GTA"] + self.codon["GTC"] + self.codon["GTG"] + self.codon["GTT"] + self.codon["TCA"] + self.codon["TCC"] + 
+            self.codon["TCG"] + self.codon["TCT"])
+        
+        self.number_of_sevens = (self.codon["ATA"] + self.codon["ATC"] + self.codon["ATT"] + self.codon["TAA"] + self.codon["TTA"] + self.codon["TTG"])
+        
+        self.number_of_eights = (self.codon["AAA"] + self.codon["AAC"] + self.codon["AAG"] + self.codon["AAT"] + self.codon["AGC"] + self.codon["AGT"] + self.codon["CAA"] + self.codon["CAC"] + 
+            self.codon["CAG"] + self.codon["CAT"] + self.codon["GAA"] + self.codon["GAC"] + self.codon["GAG"] + self.codon["GAT"] + self.codon["TAC"] + self.codon["TAG"] + self.codon["TAT"] + 
+            self.codon["TGA"] + self.codon["TGC"] + self.codon["TGT"] + self.codon["TTC"] + self.codon["TTT"])
+        
+        self.number_of_nines = (self.codon["ATG"] + self.codon["TGG"])
+
+"""things to add:
+        parse seq-find start and stop codons-extract reading frames"""
+
+#issue_seq = "aggttcccatg"
+#test_seq = "ATGTTCGAACBGTAAATTCTGACGTACTGACCGTTTCTACCGTTAACTCTCAGGAT"
+#base_perc(test_seq)
+
+testseq = DNAseq()
+testseq.base_perc()
+testseq.amino_count()
